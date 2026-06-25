@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlareIdea — Design Collection Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --void-black: #000000;
+            --panel-black: #0A0A0A;
+            --surface: #111111;
+            --border: #1A1A1A;
+            --subtle: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #666666;
+            --accent: #4DFFFF;
+            --accent-glow: rgba(77, 255, 255, 0.3);
+            
+            --font-display: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            background-color: var(--void-black);
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-weight: 300;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        /* Utility Scrollbar CSS */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--void-black);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--subtle);
+        }
+
+        /* Step 1: Entry Overlay */
+        .entry-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--void-black);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 48px;
+            transition: opacity 400ms var(--ease-premium), filter 400ms var(--ease-premium), visibility 400ms;
+        }
+
+        .entry-overlay.dissolved {
+            opacity: 0;
+            filter: blur(20px);
+            visibility: hidden;
+        }
+
+        .entry-title {
+            font-family: var(--font-display);
+            font-weight: 100;
+            font-size: clamp(24px, 4vw, 48px);
+            letter-spacing: 0.4em;
+            text-align: center;
+            color: var(--text-primary);
+            text-transform: uppercase;
+        }
+
+        .entry-options {
+            display: flex;
+            gap: 24px;
+            width: 100%;
+            max-width: 800px;
+            padding: 0 24px;
+        }
+
+        .platform-card {
+            flex: 1;
+            background: var(--panel-black);
+            border: 1px solid var(--border);
+            padding: 48px 32px;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            transition: border-color 300ms var(--ease-premium), box-shadow 300ms var(--ease-premium);
+        }
+
+        .platform-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .platform-name {
+            font-family: var(--font-display);
+            font-weight: 200;
+            font-size: 20px;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .platform-hint {
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* App Structural Layout */
+        .app-container {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            opacity: 0;
+            transition: opacity 600ms var(--ease-premium);
+        }
+
+        .app-container.ready {
+            opacity: 1;
+        }
+
+        /* Step 2: Category Selection Panel */
+        .side-panel {
+            width: 280px;
+            height: 100%;
+            background: var(--panel-black);
+            border-right: 1px solid var(--border);
+            padding: 32px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            flex-shrink: 0;
+            transform: translateX(-100%);
+            transition: transform 500ms var(--ease-premium);
+        }
+
+        .app-container.ready .side-panel {
+            transform: translateX(0);
+        }
+
+        .panel-header {
+            padding: 0 24px;
+            font-family: var(--font-display);
+            font-weight: 300;
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .category-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .category-item {
+            position: relative;
+            padding: 14px 24px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: color 200ms var(--ease-premium);
+        }
+
+        .category-item:hover {
+            color: var(--text-primary);
+        }
+
+        .category-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--accent);
+            transform: scaleY(0);
+            transition: transform 250ms var(--ease-premium);
+        }
+
+        .category-item.active {
+            color: var(--text-primary);
+        }
+
+        .category-item.active::before {
+            transform: scaleY(1);
+        }
+
+        .category-icon {
+            width: 8px;
+            height: 8px;
+            border: 1px solid var(--text-secondary);
+            transition: background 200ms, border-color 200ms;
+        }
+
+        .category-item.active .category-icon {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Step 3: Component Grid Canvas */
+        .main-canvas {
+            flex: 1;
+            height: 100%;
+            overflow-y: auto;
+            padding: 48px 48px 120px 48px;
+            position: relative;
+        }
+
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            transition: opacity 400ms var(--ease-premium);
+        }
+
+        /* Signature Element: Grid Dimming */
+        .component-grid.dimmed .component-card:not(.selected) {
+            opacity: 0.2;
+        }
+
+        .component-card {
+            background: var(--panel-black);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            will-change: transform, opacity;
+            transition: border-color 300ms var(--ease-premium), box-shadow 300ms var(--ease-premium), opacity 400ms var(--ease-premium);
+        }
+
+        .component-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .component-card:hover {
+            border-color: var(--subtle);
+        }
+
+        /* Selected State Customization */
+        .component-card.selected {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 8px rgba(77, 255, 255, 0.08);
+            opacity: 1 !important;
+        }
+
+        .preview-box {
+            width: 100%;
+            height: 180px;
+            background: var(--void-black);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .component-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .component-name {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        /* Floating Get Code Pill */
+        .get-code-pill {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: var(--accent);
+            color: var(--void-black);
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 200ms var(--ease-premium), transform 200ms var(--ease-premium);
+        }
+
+        .component-card.selected .get-code-pill {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* Step 4: Code Drawer & Code Highlighting */
+        .code-drawer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 40vh;
+            background: var(--void-black);
+            border-top: 1px solid var(--border);
+            z-index: 900;
+            transform: translateY(100%);
+            transition: transform 500ms var(--ease-premium);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-drawer.open {
+            transform: translateY(0);
+        }
+
+        .drawer-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--panel-black);
+        }
+
+        .drawer-title {
+            font-size: 11px;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+        }
+
+        .close-drawer-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .close-drawer-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .code-viewport {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .code-block {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            line-height: 1.6;
+            color: #888888;
+            white-space: pre-wrap;
+        }
+
+        /* Micro Syntax Token Coloring */
+        .token-keyword { color: var(--accent); }
+        .token-string { color: #888888; }
+        .token-punctuation { color: #555555; }
+        .token-tag { color: #FFFFFF; }
+
+        .copy-btn {
+            width: 100%;
+            background: var(--panel-black);
+            border: none;
+            border-top: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background 150ms, color 150ms;
+        }
+
+        .copy-btn:hover {
+            background: var(--surface);
+        }
+
+        .copy-btn.copied {
+            background: var(--accent);
+            color: var(--void-black);
+        }
+
+        /* Signature Element: Cyan Scan-line */
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .code-drawer.open .scan-line {
+            animation: sweep-line 600ms var(--ease-premium) forwards;
+        }
+
+        @keyframes sweep-line {
+            0% { top: 0%; opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Floating Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--panel-black);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 12px 24px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04);
+            display: flex;
+            gap: 32px;
+            z-index: 800;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            position: relative;
+            background: none;
+            border: none;
+            outline: none;
+        }
+
+        .nav-icon {
+            font-size: 14px;
+            color: #444444;
+            transition: color 150ms var(--ease-premium), text-shadow 150ms var(--ease-premium);
+        }
+
+        .nav-label {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            color: #444444;
+            letter-spacing: 0.1em;
+            transition: color 150ms var(--ease-premium);
+        }
+
+        .nav-item:hover .nav-icon { color: #AAAAAA; }
+        .nav-item:hover .nav-label { color: #AAAAAA; }
+
+        .nav-item.active .nav-icon {
+            color: var(--accent);
+            text-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .nav-item.active .nav-label {
+            color: var(--text-primary);
+        }
+
+        /* Moving Indicator Dot */
+        .nav-indicator-dot {
+            position: absolute;
+            bottom: -4px;
+            width: 4px;
+            height: 4px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            transition: left 400ms cubic-bezier(0.25, 1, 0.5, 1);
+            pointer-events: none;
+        }
+
+        /* High Fidelity Asset Mocks */
+        .preview-glass-card {
+            width: 120px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            border-radius: 4px;
+        }
+
+        .preview-split-nav {
+            width: 140px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
+        }
+        .preview-split-nav span { width: 20px; height: 2px; background: var(--subtle); }
+
+        .preview-tab-switcher {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px;
+        }
+        .preview-tab-switcher div {
+            width: 30px; height: 12px; background: var(--subtle); border-radius: 2px;
+        }
+        .preview-tab-switcher div.active {
+            background: var(--accent);
+        }
+
+        /* Mobile Responsive Overrides */
+        @media (max-width: 768px) {
+            .app-container { flex-direction: column; }
+            .side-panel {
+                width: 100%;
+                height: auto;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 850;
+                transform: translateY(100%);
+                border-right: none;
+                border-top: 1px solid var(--border);
+                padding: 16px 0;
+            }
+            .app-container.ready .side-panel { transform: translateY(0); }
+            .category-list { flex-direction: row; overflow-x: auto; padding: 0 16px; }
+            .category-item { padding: 8px 16px; flex-shrink: 0; }
+            .category-item::before { display: none; }
+            .component-grid { grid-template-columns: 1fr; gap: 16px; }
+            .main-canvas { padding: 24px 24px 140px 24px; }
+            .entry-options { flex-direction: column; }
+            .bottom-nav { width: calc(100% - 32px); justify-content: space-around; gap: 0; }
+        }
+
+        /* Accessibility Handling */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Step 1: Entry Overlay Screen -->
+    <div class="entry-overlay" id="entryOverlay">
+        <h1 class="entry-title">What are you building?</h1>
+        <div class="entry-options">
+            <div class="platform-card" onclick="selectPlatform('website')">
+                <div class="platform-name">Website</div>
+                <div class="platform-hint">↗ Web Components</div>
+            </div>
+            <div class="platform-card" onclick="selectPlatform('mobile')">
+                <div class="platform-name">Mobile App</div>
+                <div class="platform-hint">↗ App Components</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interface Workspace Application Container -->
+    <div class="app-container" id="appContainer">
+        
+        <!-- Step 2: Category Selector Side Panel -->
+        <aside class="side-panel">
+            <div class="panel-header" onclick="resetToPlatform()">
+                ← DesignKit
+            </div>
+            <ul class="category-list">
+                <li class="category-item active" onclick="switchCategory(this)"><span class="category-icon"></span>Navigation Panels</li>
+                <li class="category-item" onclick="switchCategory(this)"><span class="category-icon"></span>Layouts & Grids</li>
+                <li class="category-item" onclick="switchCategory(this)"><span class="category-icon"></span>Backgrounds</li>
+                <li class="category-item" onclick="switchCategory(this)"><span class="category-icon"></span>Buttons & CTAs</li>
+                <li class="category-item" onclick="switchCategory(this)"><span class="category-icon"></span>Cards & Containers</li>
+                <li class="category-item" onclick="switchCategory(this)"><span class="category-icon"></span>Forms & Inputs</li>
+                <li class="category-item" onclick="switchCategory(this)"><span class="category-icon"></span>Typography Styles</li>
+            </ul>
+        </aside>
+
+        <!-- Step 3: Central Component Playground Canvas -->
+        <main class="main-canvas" id="mainCanvas">
+            <div class="component-grid" id="componentGrid">
+                <!-- Statically dynamic premium UI elements populated via JS script engine -->
+            </div>
+        </main>
+
+        <!-- Step 4: Bottom Code Viewer Panel -->
+        <div class="code-drawer" id="codeDrawer">
+            <div class="scan-line"></div>
+            <div class="drawer-header">
+                <div class="drawer-title" id="drawerTitle">COMPONENT ENGINE CODE</div>
+                <button class="close-drawer-btn" onclick="toggleDrawer(false)">✕</button>
+            </div>
+            <div class="code-viewport">
+                <pre class="code-block"><code id="codeOutput"></code></pre>
+            </div>
+            <button class="copy-btn" id="copyBtn" onclick="copyCode()">Copy Code</button>
+        </div>
+
+        <!-- System Architecture Modular Bottom Navigation Bar Floating Interface -->
+        <nav class="bottom-nav" id="bottomNav">
+            <button class="nav-item active" onclick="moveNavIndicator(this)">
+                <span class="nav-icon">⊞</span>
+                <span class="nav-label">Browse</span>
+            </button>
+            <button class="nav-item" onclick="moveNavIndicator(this)">
+                <span class="nav-icon">◎</span>
+                <span class="nav-label">Preview</span>
+            </button>
+            <button class="nav-item" onclick="moveNavIndicator(this)">
+                <span class="nav-icon">✦</span>
+                <span class="nav-label">Saved</span>
+            </button>
+            <button class="nav-item" onclick="moveNavIndicator(this)">
+                <span class="nav-icon">⌨</span>
+                <span class="nav-label">My Code</span>
+            </button>
+            <button class="nav-item" onclick="moveNavIndicator(this)">
+                <span class="nav-icon">◐</span>
+                <span class="nav-label">Settings</span>
+            </button>
+            <div class="nav-indicator-dot" id="navIndicatorDot"></div>
+        </nav>
+    </div>
+
+    <script>
+        // High fidelity components mock structural reference datasets
+        const itemsMockData = [
+            { id: "glass-card", name: "Glassmorphism Card", html: `<div class="glass-card">\n  <span class="token-tag">&lt;div</span> <span class="token-keyword">class</span>=<span class="token-string">"panel"</span><span class="token-tag">&gt;</span>\n    Curated Architecture Canvas\n  <span class="token-tag">&lt;/div&gt;</span>\n</div>`, visual: `<div class="preview-glass-card"></div>` },
+            { id: "split-nav", name: "Split Navigation Bar", html: `<nav class="split-nav">\n  <span class="token-tag">&lt;span</span> <span class="token-keyword">class</span>=<span class="token-string">"brand"</span><span class="token-tag">&gt;</span>F.<span class="token-tag">&lt;/span&gt;</span>\n  <span class="token-tag">&lt;div</span> <span class="token-keyword">class</span>=<span class="token-string">"links"</span><span class="token-tag">&gt;</span>...<span class="token-tag">&lt;/div&gt;</span>\n</nav>`, visual: `<div class="preview-split-nav"><span></span><span></span></div>` },
+            { id: "tab-switch", name: "Animated Tab Switcher", html: `<div class="tab-box">\n  <span class="token-tag">&lt;button</span> <span class="token-keyword">class</span>=<span class="token-string">"active"</span><span class="token-tag">&gt;</span>UI<span class="token-tag">&lt;/button&gt;</span>\n  <span class="token-tag">&lt;button&gt;</span>Code<span class="token-tag">&lt;/button&gt;</span>\n</div>`, visual: `<div class="preview-tab-switcher"><div class="active"></div><div></div></div>` },
+            { id: "terminal-view", name: "Terminal Context Container", html: `<pre class="shell">\n  <span class="token-punctuation">$</span> <span class="token-keyword">npm run</span> engine-boot\n</pre>`, visual: `<div style="width:110px; height:60px; border:1px solid #1A1A1A; background:#000; border-radius:3px; padding:6px; font-size:6px; color:#4DFFFF">>_ live execution</div>` },
+            { id: "action-trigger", name: "Micro-interaction Button", html: `<button class="action-trigger">\n  Execute Trace\n</button>`, visual: `<div style="padding:6px 12px; border:1px solid #4DFFFF; color:#4DFFFF; font-size:10px; border-radius:2px; box-shadow:0 0 10px rgba(77,255,255,0.2)">TRIGGER</div>` },
+            { id: "data-grid", name: "Surgical Layout Grid", html: `<div class="surgical-grid">\n  <span class="token-tag">&lt;div&gt;</span>Trace Unit Matrix Nodes<span class="token-tag">&lt;/div&gt;</span>\n</div>`, visual: `<div style="display:grid; grid-template-columns:repeat(2,1fr); gap:4px; width:100px;"><div style="border:1px dashed #2A2A2A; height:20px;"></div><div style="border:1px dashed #2A2A2A; height:20px;"></div><div style="border:1px dashed #2A2A2A; height:20px;"></div><div style="border:1px dashed #2A2A2A; height:20px;"></div></div>` }
+        ];
+
+        let selectedPlatformContext = '';
+        let viewScrollObserver;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initApp();
+        });
+
+        function initApp() {
+            setupScrollObserver();
+            // Align navigation active node layout configurations tracking positions
+            const initialActiveNav = document.querySelector('.nav-item.active');
+            if(initialActiveNav) moveNavIndicator(initialActiveNav);
+        }
+
+        function selectPlatform(platform) {
+            selectedPlatformContext = platform;
+            const overlay = document.getElementById('entryOverlay');
+            const container = document.getElementById('appContainer');
+            
+            overlay.classList.add('dissolved');
+            container.classList.add('ready');
+            
+            loadCards();
+        }
+
+        function resetToPlatform() {
+            const overlay = document.getElementById('entryOverlay');
+            const container = document.getElementById('appContainer');
+            
+            container.classList.remove('ready');
+            overlay.classList.remove('dissolved');
+            toggleDrawer(false);
+        }
+
+        function switchCategory(element) {
+            document.querySelectorAll('.category-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+            loadCards();
+        }
+
+        function loadCards() {
+            const grid = document.getElementById('componentGrid');
+            grid.classList.remove('dimmed');
+            grid.innerHTML = ''; 
+
+            itemsMockData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'component-card';
+                card.dataset.id = item.id;
+                card.innerHTML = `
+                    <div class="preview-box">
+                        ${item.visual}
+                        <button class="get-code-pill" onclick="openComponentSource(event, '${item.id}')">GET CODE →</button>
+                    </div>
+                    <div class="component-info">
+                        <span class="component-name">${item.name}</span>
+                    </div>
+                `;
+                
+                // Native programmatic selection toggling interface assignment
+                card.addEventListener('click', (e) => {
+                    if(!e.target.classList.contains('get-code-pill')) {
+                        selectCard(card);
+                    }
+                });
+
+                grid.appendChild(card);
+                viewScrollObserver.observe(card);
+            });
+        }
+
+        function setupScrollObserver() {
+            viewScrollObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry, idx) => {
+                    if(entry.isIntersecting) {
+                        // Apply uniform mathematical stagger sequence timeline executions
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, idx * 60);
+                        viewScrollObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
+        }
+
+        function selectCard(cardElement) {
+            const grid = document.getElementById('componentGrid');
+            const isAlreadySelected = cardElement.classList.contains('selected');
+
+            document.querySelectorAll('.component-card').forEach(card => card.classList.remove('selected'));
+            
+            if(!isAlreadySelected) {
+                cardElement.classList.add('selected');
+                grid.classList.add('dimmed');
+            } else {
+                grid.classList.remove('dimmed');
+                toggleDrawer(false);
+            }
+        }
+
+        function openComponentSource(event, componentId) {
+            event.stopPropagation(); 
+            const component = itemsMockData.find(item => item.id === componentId);
+            if (!component) return;
+
+            document.getElementById('drawerTitle').innerText = `${component.name.toUpperCase()} ENGINE MATRIX SOURCE`;
+            document.getElementById('codeOutput').innerHTML = component.html;
+            
+            toggleDrawer(true);
+        }
+
+        function toggleDrawer(isOpen) {
+            const drawer = document.getElementById('codeDrawer');
+            const grid = document.getElementById('componentGrid');
+            const copyBtn = document.getElementById('copyBtn');
+            
+            copyBtn.classList.remove('copied');
+            copyBtn.innerText = "Copy Code";
+
+            if (isOpen) {
+                drawer.classList.add('open');
+            } else {
+                drawer.classList.remove('open');
+                grid.classList.remove('dimmed');
+                document.querySelectorAll('.component-card').forEach(card => card.classList.remove('selected'));
+            }
+        }
+
+        function copyCode() {
+            const codeText = document.getElementById('codeOutput').innerText;
+            const copyBtn = document.getElementById('copyBtn');
+            
+            navigator.clipboard.writeText(codeText).then(() => {
+                copyBtn.classList.add('copied');
+                copyBtn.innerText = "Copied ✓";
+                
+                setTimeout(() => {
+                    copyBtn.classList.remove('copied');
+                    copyBtn.innerText = "Copy Code";
+                }, 2000);
+            }).catch(err => {
+                console.error('System process failed to parse payload copy architecture: ', err);
+            });
+        }
+
+        function moveNavIndicator(element) {
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+
+            const indicator = document.getElementById('navIndicatorDot');
+            const elementLeftOffset = element.offsetLeft;
+            const elementWidthOffset = element.offsetWidth;
+            
+            // Align vector dot point exactly tracking active relative element item sizes
+            indicator.style.left = `${elementLeftOffset + (elementWidthOffset / 2) - 2}px`;
+        }
+    </script>
+</body>
+  </html>
