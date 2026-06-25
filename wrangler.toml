@@ -1,7 +1,14 @@
+#:schema node_modules/wrangler/config-schema.json
 name = "flareidea"
 main = "main.py"
 compatibility_date = "2026-06-25"
 
-[compatibility_flags]
-# Включение поддержки нативного Python в Cloudflare Workers
-python_workers = true
+# КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Флаги должны быть строго в квадратных скобках [ "..." ]
+compatibility_flags = [ "python_workers" ]
+
+[assets]
+binding = "ASSETS"
+directory = "."
+
+[http]
+server = "fastapi"
