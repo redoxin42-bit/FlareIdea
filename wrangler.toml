@@ -1,0 +1,7 @@
+name = "flareidea-backend"
+main = "main.py"
+compatibility_date = "2026-06-25"
+
+[compatibility_flags]
+# Включение поддержки нативного Python в Cloudflare Workers
+python_workers = true
