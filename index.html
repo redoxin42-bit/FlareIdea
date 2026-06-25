@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,7 +42,6 @@
             height: 100vh;
         }
 
-        /* Utility Scrollbar CSS */
         ::-webkit-scrollbar {
             width: 4px;
             height: 4px;
@@ -57,7 +56,7 @@
             background: var(--subtle);
         }
 
-        /* Step 1: Entry Overlay */
+        /* Шаг 1: Приветственный экран выборки */
         .entry-overlay {
             position: fixed;
             inset: 0;
@@ -128,7 +127,7 @@
             gap: 6px;
         }
 
-        /* App Structural Layout */
+        /* Главный контейнер рабочей среды */
         .app-container {
             display: flex;
             width: 100vw;
@@ -141,7 +140,7 @@
             opacity: 1;
         }
 
-        /* Step 2: Category Selection Panel */
+        /* Шаг 2: Сайдбар меню категорий */
         .side-panel {
             width: 280px;
             height: 100%;
@@ -227,7 +226,7 @@
             border-color: var(--accent);
         }
 
-        /* Step 3: Component Grid Canvas */
+        /* Шаг 3: Основной холст сетки компонентов */
         .main-canvas {
             flex: 1;
             height: 100%;
@@ -243,7 +242,6 @@
             transition: opacity 400ms var(--ease-premium);
         }
 
-        /* Signature Element: Grid Dimming */
         .component-grid.dimmed .component-card:not(.selected) {
             opacity: 0.2;
         }
@@ -272,7 +270,6 @@
             border-color: var(--subtle);
         }
 
-        /* Selected State Customization */
         .component-card.selected {
             border-color: var(--accent) !important;
             box-shadow: 0 0 0 8px rgba(77, 255, 255, 0.08);
@@ -303,7 +300,6 @@
             color: var(--text-secondary);
         }
 
-        /* Floating Get Code Pill */
         .get-code-pill {
             position: absolute;
             top: 50%;
@@ -330,7 +326,7 @@
             transform: translate(-50%, -50%) scale(1);
         }
 
-        /* Step 4: Code Drawer & Code Highlighting */
+        /* Шаг 4: Нижний терминал просмотра кода */
         .code-drawer {
             position: fixed;
             left: 0;
@@ -392,7 +388,7 @@
             white-space: pre-wrap;
         }
 
-        /* Micro Syntax Token Coloring */
+        /* Подсветка токенов кода */
         .token-keyword { color: var(--accent); }
         .token-string { color: #888888; }
         .token-punctuation { color: #555555; }
@@ -422,7 +418,6 @@
             color: var(--void-black);
         }
 
-        /* Signature Element: Cyan Scan-line */
         .scan-line {
             position: absolute;
             top: 0;
@@ -443,7 +438,7 @@
             100% { top: 100%; opacity: 0; }
         }
 
-        /* Floating Bottom Navigation Bar */
+        /* Плавающий таббар навигации */
         .bottom-nav {
             position: fixed;
             bottom: 24px;
@@ -497,7 +492,6 @@
             color: var(--text-primary);
         }
 
-        /* Moving Indicator Dot */
         .nav-indicator-dot {
             position: absolute;
             bottom: -4px;
@@ -509,7 +503,7 @@
             pointer-events: none;
         }
 
-        /* High Fidelity Asset Mocks */
+        /* Моки превью элементов дизайна */
         .preview-glass-card {
             width: 120px;
             height: 70px;
@@ -541,7 +535,6 @@
             background: var(--accent);
         }
 
-        /* Mobile Responsive Overrides */
         @media (max-width: 768px) {
             .app-container { flex-direction: column; }
             .side-panel {
@@ -566,21 +559,10 @@
             .entry-options { flex-direction: column; }
             .bottom-nav { width: calc(100% - 32px); justify-content: space-around; gap: 0; }
         }
-
-        /* Accessibility Handling */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-                scroll-behavior: auto !important;
-            }
-        }
     </style>
 </head>
 <body>
 
-    <!-- Step 1: Entry Overlay Screen -->
     <div class="entry-overlay" id="entryOverlay">
         <h1 class="entry-title">What are you building?</h1>
         <div class="entry-options">
@@ -595,10 +577,8 @@
         </div>
     </div>
 
-    <!-- Interface Workspace Application Container -->
     <div class="app-container" id="appContainer">
         
-        <!-- Step 2: Category Selector Side Panel -->
         <aside class="side-panel">
             <div class="panel-header" onclick="resetToPlatform()">
                 ← DesignKit
@@ -614,14 +594,11 @@
             </ul>
         </aside>
 
-        <!-- Step 3: Central Component Playground Canvas -->
         <main class="main-canvas" id="mainCanvas">
             <div class="component-grid" id="componentGrid">
-                <!-- Statically dynamic premium UI elements populated via JS script engine -->
-            </div>
+                </div>
         </main>
 
-        <!-- Step 4: Bottom Code Viewer Panel -->
         <div class="code-drawer" id="codeDrawer">
             <div class="scan-line"></div>
             <div class="drawer-header">
@@ -634,7 +611,6 @@
             <button class="copy-btn" id="copyBtn" onclick="copyCode()">Copy Code</button>
         </div>
 
-        <!-- System Architecture Modular Bottom Navigation Bar Floating Interface -->
         <nav class="bottom-nav" id="bottomNav">
             <button class="nav-item active" onclick="moveNavIndicator(this)">
                 <span class="nav-icon">⊞</span>
@@ -661,16 +637,8 @@
     </div>
 
     <script>
-        // High fidelity components mock structural reference datasets
-        const itemsMockData = [
-            { id: "glass-card", name: "Glassmorphism Card", html: `<div class="glass-card">\n  <span class="token-tag">&lt;div</span> <span class="token-keyword">class</span>=<span class="token-string">"panel"</span><span class="token-tag">&gt;</span>\n    Curated Architecture Canvas\n  <span class="token-tag">&lt;/div&gt;</span>\n</div>`, visual: `<div class="preview-glass-card"></div>` },
-            { id: "split-nav", name: "Split Navigation Bar", html: `<nav class="split-nav">\n  <span class="token-tag">&lt;span</span> <span class="token-keyword">class</span>=<span class="token-string">"brand"</span><span class="token-tag">&gt;</span>F.<span class="token-tag">&lt;/span&gt;</span>\n  <span class="token-tag">&lt;div</span> <span class="token-keyword">class</span>=<span class="token-string">"links"</span><span class="token-tag">&gt;</span>...<span class="token-tag">&lt;/div&gt;</span>\n</nav>`, visual: `<div class="preview-split-nav"><span></span><span></span></div>` },
-            { id: "tab-switch", name: "Animated Tab Switcher", html: `<div class="tab-box">\n  <span class="token-tag">&lt;button</span> <span class="token-keyword">class</span>=<span class="token-string">"active"</span><span class="token-tag">&gt;</span>UI<span class="token-tag">&lt;/button&gt;</span>\n  <span class="token-tag">&lt;button&gt;</span>Code<span class="token-tag">&lt;/button&gt;</span>\n</div>`, visual: `<div class="preview-tab-switcher"><div class="active"></div><div></div></div>` },
-            { id: "terminal-view", name: "Terminal Context Container", html: `<pre class="shell">\n  <span class="token-punctuation">$</span> <span class="token-keyword">npm run</span> engine-boot\n</pre>`, visual: `<div style="width:110px; height:60px; border:1px solid #1A1A1A; background:#000; border-radius:3px; padding:6px; font-size:6px; color:#4DFFFF">>_ live execution</div>` },
-            { id: "action-trigger", name: "Micro-interaction Button", html: `<button class="action-trigger">\n  Execute Trace\n</button>`, visual: `<div style="padding:6px 12px; border:1px solid #4DFFFF; color:#4DFFFF; font-size:10px; border-radius:2px; box-shadow:0 0 10px rgba(77,255,255,0.2)">TRIGGER</div>` },
-            { id: "data-grid", name: "Surgical Layout Grid", html: `<div class="surgical-grid">\n  <span class="token-tag">&lt;div&gt;</span>Trace Unit Matrix Nodes<span class="token-tag">&lt;/div&gt;</span>\n</div>`, visual: `<div style="display:grid; grid-template-columns:repeat(2,1fr); gap:4px; width:100px;"><div style="border:1px dashed #2A2A2A; height:20px;"></div><div style="border:1px dashed #2A2A2A; height:20px;"></div><div style="border:1px dashed #2A2A2A; height:20px;"></div><div style="border:1px dashed #2A2A2A; height:20px;"></div></div>` }
-        ];
-
+        // Динамический массив, получающий структуру с сервера FastAPI
+        let itemsMockData = [];
         let selectedPlatformContext = '';
         let viewScrollObserver;
 
@@ -680,9 +648,21 @@
 
         function initApp() {
             setupScrollObserver();
-            // Align navigation active node layout configurations tracking positions
+            fetchComponents(); // Первичный асинхронный вызов бэкенда
             const initialActiveNav = document.querySelector('.nav-item.active');
             if(initialActiveNav) moveNavIndicator(initialActiveNav);
+        }
+
+        async function fetchComponents() {
+            try {
+                // Запрос к API эндпоинту Python-сервера
+                const response = await fetch('/api/components');
+                if (!response.ok) throw new Error('Ошибка канала связи API');
+                itemsMockData = await response.json();
+                loadCards(); 
+            } catch (err) {
+                console.error("Critical breakdown linking core Python engine: ", err);
+            }
         }
 
         function selectPlatform(platform) {
@@ -692,8 +672,6 @@
             
             overlay.classList.add('dissolved');
             container.classList.add('ready');
-            
-            loadCards();
         }
 
         function resetToPlatform() {
@@ -716,6 +694,8 @@
             grid.classList.remove('dimmed');
             grid.innerHTML = ''; 
 
+            if(itemsMockData.length === 0) return;
+
             itemsMockData.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = 'component-card';
@@ -730,7 +710,6 @@
                     </div>
                 `;
                 
-                // Native programmatic selection toggling interface assignment
                 card.addEventListener('click', (e) => {
                     if(!e.target.classList.contains('get-code-pill')) {
                         selectCard(card);
@@ -746,7 +725,6 @@
             viewScrollObserver = new IntersectionObserver((entries) => {
                 entries.forEach((entry, idx) => {
                     if(entry.isIntersecting) {
-                        // Apply uniform mathematical stagger sequence timeline executions
                         setTimeout(() => {
                             entry.target.classList.add('visible');
                         }, idx * 60);
@@ -824,9 +802,8 @@
             const elementLeftOffset = element.offsetLeft;
             const elementWidthOffset = element.offsetWidth;
             
-            // Align vector dot point exactly tracking active relative element item sizes
             indicator.style.left = `${elementLeftOffset + (elementWidthOffset / 2) - 2}px`;
         }
     </script>
 </body>
-  </html>
+    </html>
